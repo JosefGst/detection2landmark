@@ -25,8 +25,6 @@ public:
 
         publisher_ = this->create_publisher<cartographer_ros_msgs::msg::LandmarkList>("landmark", 10);
 
-        // Declare and acquire `target_frame` parameter
-        target_frame_ = this->declare_parameter<std::string>("tag36h11:2", "camF");
         tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
         tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
     }
@@ -34,7 +32,6 @@ public:
 private:
     void detection_callback(const apriltag_msgs::msg::AprilTagDetectionArray::SharedPtr msg)
     {
-        std::string fromFrameRel = target_frame_.c_str();
         //   RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->header.frame_id.c_str());
 
         auto landmark = cartographer_ros_msgs::msg::LandmarkList();
@@ -46,15 +43,35 @@ private:
 
         for (int tag_id = 0; tag_id < msg->detections.size(); tag_id++)
         {
-            // RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->header.frame_id.c_str());
+            std::string fromFrameRel = "tag36h11:";
+            std::string toFrameRel = "camF";
+            geometry_msgs::msg::TransformStamped t;
+
             landmark_entry.id = std::to_string(msg->detections[tag_id].id);
-            // landmark_entry.tracking_from_landmark_transform.position = msg->
+
+            // get position and rotation from tf
+            try
+            {
+                fromFrameRel = fromFrameRel.append(std::to_string(msg->detections[tag_id].id));
+                t = tf_buffer_->lookupTransform(toFrameRel, fromFrameRel, tf2::TimePointZero);
+            }
+            catch (const tf2::TransformException &ex)
+            {
+                RCLCPP_INFO(this->get_logger(), "Could not transform %s to %s: %s", toFrameRel.c_str(), fromFrameRel.c_str(), ex.what());
+                return;
+            }
+            landmark_entry.tracking_from_landmark_transform.position.x = t.transform.translation.x;
+            landmark_entry.tracking_from_landmark_transform.position.y = t.transform.translation.y;
+            landmark_entry.tracking_from_landmark_transform.position.z = t.transform.translation.z;
+            landmark_entry.tracking_from_landmark_transform.orientation.x = t.transform.rotation.x;
+            landmark_entry.tracking_from_landmark_transform.orientation.y = t.transform.rotation.y;
+            landmark_entry.tracking_from_landmark_transform.orientation.z = t.transform.rotation.z;
+            landmark_entry.tracking_from_landmark_transform.orientation.w = t.transform.rotation.w;
             landmark_entry.translation_weight = 1e2;
             landmark_entry.rotation_weight = 1e2;
             landmark.landmarks.push_back(landmark_entry);
         }
 
-        
         publisher_->publish(landmark);
     }
 
