@@ -1,0 +1,6 @@
+detection2landmark:
+  ros__parameters:
+    camera_frame: "camF"
+    family: "36h11"       # tag family
+    rotation_weight: 1e1
+    translation_weight: 1e1

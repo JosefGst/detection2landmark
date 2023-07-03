@@ -80,8 +80,8 @@ private:
             landmark_entry.tracking_from_landmark_transform.orientation.y = trans.transform.rotation.y;
             landmark_entry.tracking_from_landmark_transform.orientation.z = trans.transform.rotation.z;
             landmark_entry.tracking_from_landmark_transform.orientation.w = trans.transform.rotation.w;
-            landmark_entry.translation_weight = 1e2;
-            landmark_entry.rotation_weight = 1e2;
+            landmark_entry.translation_weight = translation_weight_;
+            landmark_entry.rotation_weight = rotation_weight_;
             landmark.landmarks.push_back(landmark_entry);
         }
 
