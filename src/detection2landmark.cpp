@@ -22,7 +22,7 @@ public:
     {
         // declare params
         this->declare_parameter("family", "36h11");
-        this->declare_parameter("camera_frame", "camF");
+        this->declare_parameter("camera_frame", "camera_link");
         this->declare_parameter("translation_weight", 1e2);
         this->declare_parameter("rotation_weight", 1e2);
         rclcpp::Parameter family = this->get_parameter("family");
@@ -51,11 +51,11 @@ private:
         auto april_entry = apriltag_msgs::msg::AprilTagDetection();
 
         landmark.header = msg->header;
-        landmark_entry.id = msg->detections[0].id;
 
+        // RCLCPP_INFO(this->get_logger(), "detection size: %d", msg->detections.size());
         for (int tag_id = 0; tag_id < msg->detections.size(); tag_id++)
         {
-
+            // RCLCPP_INFO(this->get_logger(), "tag_id: %d", tag_id);
             std::string toFrameRel = camera_frame_;
             std::string fromFrameRel = tag_family_;
             geometry_msgs::msg::TransformStamped trans;
