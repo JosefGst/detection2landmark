@@ -22,10 +22,12 @@ public:
     {
         // declare params
         this->declare_parameter("family", "36h11");
+        this->declare_parameter("detections_topic", "detections");
         this->declare_parameter("camera_frame", "camera_link");
         this->declare_parameter("translation_weight", 1e2);
         this->declare_parameter("rotation_weight", 1e2);
         rclcpp::Parameter family = this->get_parameter("family");
+        rclcpp::Parameter detections_topic = this->get_parameter("detections_topic");
         rclcpp::Parameter camera_frame = this->get_parameter("camera_frame");
         rclcpp::Parameter translation_weight = this->get_parameter("translation_weight");
         rclcpp::Parameter rotation_weight = this->get_parameter("rotation_weight");
@@ -35,7 +37,7 @@ public:
         rotation_weight_ = rotation_weight.as_double();
 
         subscription_ = this->create_subscription<apriltag_msgs::msg::AprilTagDetectionArray>(
-            "camF/detections", 10, std::bind(&Detection2Landmark::detection_callback, this, _1));
+            detections_topic.as_string(), 10, std::bind(&Detection2Landmark::detection_callback, this, _1));
 
         publisher_ = this->create_publisher<cartographer_ros_msgs::msg::LandmarkList>("landmark", 10);
 
@@ -52,7 +54,13 @@ private:
 
         landmark.header = msg->header;
 
-        // RCLCPP_INFO(this->get_logger(), "detection size: %d", msg->detections.size());
+        // trying ranged for loop
+        // for (auto &tag_id : msg->detections)
+        // {
+        //     RCLCPP_INFO(this->get_logger(), "hello world");
+        //     RCLCPP_INFO(this->get_logger(), "tag_id %d", &tag_id);
+        // }
+        // RCLCPP_INFO(this->get_logger(), "---");
         for (int tag_id = 0; tag_id < msg->detections.size(); tag_id++)
         {
             // RCLCPP_INFO(this->get_logger(), "tag_id: %d", tag_id);
