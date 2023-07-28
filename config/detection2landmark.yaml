@@ -3,5 +3,5 @@ detection2landmark:
     camera_frame: "camF_optical_frame"
     detections_topic: "camF/detections"
     family: "36h11"       # tag family
-    rotation_weight: 1e-1
-    translation_weight: 1e1
+    rotation_weight: 1e2
+    translation_weight: 1e2
