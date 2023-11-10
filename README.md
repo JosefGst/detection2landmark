@@ -1,5 +1,5 @@
 # Aprilt tag detections to Landmarks for cartographer Ros 2
-![industrial ci badge](https://github.com/JosefGst/detection2landmark/blob/master/.github/workflows/industrial_ci.yaml/badge.svg)
+![industrial ci badge](https://github.com/JosefGst/detection2landmark/actions/workflows/industrial_ci.yaml/badge.svg)
 
     ros2 run detection2landmark detection2landmark
 
